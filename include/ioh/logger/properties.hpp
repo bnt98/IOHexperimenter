@@ -12,7 +12,7 @@ namespace ioh
 
         //! Default format for storing doubles
         inline std::string DEFAULT_DOUBLE_FORMAT = "{:.10f}";
-        
+
         /** @defgroup Properties Properties
          * Accessors to values that are to be logged.
          *
@@ -100,7 +100,7 @@ namespace ioh
 
             //! Configured format accessor.
             std::string format() const { return format_; }
-            
+
             //! Accessor for name
             void set_name(const std::string& name) {name_ = name;}
 
@@ -118,7 +118,7 @@ namespace ioh
             {
                 auto opt = (*this)(log_info);
                 if (opt)
-                    return fmt::format(format(), opt.value());
+                    return fmt::format(fmt::runtime(format()), opt.value());
                 return nan;
             }
         };
@@ -156,7 +156,7 @@ namespace ioh
             {
                 auto opt = (*this)(log_info);
                 if (opt)
-                    return fmt::format(format(), static_cast<int>(opt.value()));
+                    return fmt::format(fmt::runtime(format()), static_cast<int>(opt.value()));
                 return nan;
             }
         };
@@ -164,7 +164,7 @@ namespace ioh
          *
          * @ingroup Properties
          */
-        inline Evaluations evaluations; 
+        inline Evaluations evaluations;
 
         /** A property that access the cyrrent objective value, without transformation.
          *
@@ -182,7 +182,7 @@ namespace ioh
             {
                 if(abs(log_info.raw_y) == std::numeric_limits<double>::infinity()){
                     return {};
-                }                
+                }
                 return std::make_optional(log_info.raw_y);
             }
         };
@@ -191,7 +191,7 @@ namespace ioh
          *
          * @ingroup Properties
          */
-        inline RawY raw_y; 
+        inline RawY raw_y;
 
         /** A property that access the best value so far, without transformation.
          *
@@ -214,7 +214,7 @@ namespace ioh
          *
          * @ingroup Properties
          */
-        inline RawYBest raw_y_best;         
+        inline RawYBest raw_y_best;
 
         /** A property that access the current value so far, with transformation.
          *
@@ -237,7 +237,7 @@ namespace ioh
          *
          * @ingroup Properties
          */
-        inline TransformedY transformed_y; 
+        inline TransformedY transformed_y;
 
         /** A property that access the best value found so far, with transformation.
          *
@@ -260,7 +260,7 @@ namespace ioh
          *
          * @ingroup Properties
          */
-        inline TransformedYBest transformed_y_best; 
+        inline TransformedYBest transformed_y_best;
 
         /** A property that access the current value so far, with transformation and constraints applied
          *
@@ -283,7 +283,7 @@ namespace ioh
          *
          * @ingroup Properties
          */
-        inline CurrentY current_y; 
+        inline CurrentY current_y;
 
 
          /** A property that access the current best value so far, with transformation and constraints applied
@@ -352,7 +352,7 @@ namespace ioh
         {
             //! Constructor.
             //! Main call interface.
-            Penalty(const std::string name = "penalty", 
+            Penalty(const std::string name = "penalty",
                     const std::string &format = logger::DEFAULT_DOUBLE_FORMAT,
                     const size_t ci = 0
                 ) :
@@ -458,7 +458,7 @@ namespace ioh
          *
          * @param name the name of the property.
          * @param variable a pointer to the logged variable.
-         * @param format a string to format the variable when logging. 
+         * @param format a string to format the variable when logging.
          *
          * @ingroup Properties
          */
@@ -491,12 +491,12 @@ namespace ioh
             //! Typedef for the const ptr ref
             using RefType = ConstPtrType &;
             //! Typedef for the const const ptr ref
-            using ConstRefType = RefType; 
+            using ConstRefType = RefType;
 
             // using Type = const T *const &;
             // We failed to make the above direct declaration work under g++-8 and clang++-9.
             // It would silently generate a code that fails to have the correct behaviour.
-            
+
         protected:
             //! The managed reference to a pointer.
             ConstRefType _ref_ptr_var;
@@ -504,7 +504,7 @@ namespace ioh
 #ifndef NDEBUG
         public:
             //! Accessor for the internal ptr
-            RefType ref_ptr_var() const {return const_cast<RefType>(_ref_ptr_var);} // g++-8 issues a warning for the const having no effect.           
+            RefType ref_ptr_var() const {return const_cast<RefType>(_ref_ptr_var);} // g++-8 issues a warning for the const having no effect.
 #endif
         public:
             /** Constructor.
