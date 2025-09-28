@@ -4,6 +4,7 @@
 #include <pybind11/stl.h>
 
 #include "ioh.hpp"
+#include "numpy.hpp"
 
 namespace py = pybind11;
 using namespace ioh::problem;
@@ -70,7 +71,7 @@ public:
 
     double evaluate(const std::vector<T> &x) override
     {
-        PYBIND11_OVERRIDE_PURE(double, P, evaluate, py::array(x.size(), x.data()));
+        PYBIND11_OVERRIDE_PURE(double, P, evaluate, py::cast(x));
     }
 
     [[nodiscard]] std::vector<T> transform_variables(std::vector<T> x) override
@@ -211,6 +212,8 @@ void define_base_class(py::module &m, const std::string &name)
 }
 
 
+
+
 template <typename T>
 void define_wrapper_functions(py::module &m, const std::string &class_name, const std::string &function_name)
 {
@@ -224,13 +227,19 @@ void define_wrapper_functions(py::module &m, const std::string &class_name, cons
            std::optional<double> ub, std::optional<py::handle> tx, std::optional<py::handle> ty,
            std::optional<py::handle> co, Constraints<T> cs) {
             register_python_fn(f);
-            auto of = [f](const std::vector<T> &x) { return PyFloat_AsDouble(f(py::array(x.size(), x.data())).ptr()); };
+            
+            auto of = [f](const std::vector<T> &x) {
+                py::gil_scoped_acquire gil;                      
+                return py::cast<double>(f(make_array(x)));
+            };
 
             auto ptx = [tx](std::vector<T> x, const int iid) {
                 if (tx)
                 {
                     static bool r = register_python_fn(tx.value());
-                    py::list px = (tx.value()(py::array(x.size(), x.data()), iid));
+
+                    py::gil_scoped_acquire gil;
+                    py::list px = py::cast<py::list>(tx.value()(make_mutable_array(x, py::cast(&x)), iid));
                     if (px.size() == x.size())
                         return px.cast<std::vector<T>>();
                     else

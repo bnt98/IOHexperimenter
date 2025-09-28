@@ -162,7 +162,7 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     test_suite="tests.python",
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     setup_requires=[
         "setuptools",
         "wheel",
@@ -174,5 +174,5 @@ setup(
     ],
     license="BSD",
     url="https://iohprofiler.github.io/IOHexperimenter",
-    install_requires=["numpy<2.0.0"]
+    install_requires=["numpy>=2.0"]
 )
